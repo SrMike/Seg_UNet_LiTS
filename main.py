@@ -4,6 +4,7 @@ Created on Wed Aug 11 18:07:42 2021
 
 @author: Miguel
 """
+!pip install albumentations
 import torch
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
@@ -37,7 +38,7 @@ NUM_WORKERS = 2
 IMAGE_HEIGHT = 512  # 
 IMAGE_WIDTH =  512  # 
 PIN_MEMORY = True
-LOAD_MODEL = False
+LOAD_MODEL = True
 
 
 TRAIN_IMG_DIR = "/content/entrenamiento/vol"
@@ -62,7 +63,7 @@ nombre = generador_nombre(datos = DATOS,
                           largo = IMAGE_WIDTH,
                           batch = BATCH_SIZE, 
                           aumento_datos = D_A, 
-                          optimización = OPTIM,
+                          optim = OPTIM,
                           fech = False,
                           n_clases = n_clases)
 print(nombre)
@@ -95,7 +96,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler,info):
             loss = loss_fn(predictions.float(), targets.float())
             fin = t.time()
 
-            info.agrega(info.iteración, loss.detach().cpu().numpy(), fin - inicio, fecha(), info.optim, info.ancho, info.largo, 0, 0)
+            info.agrega(info.it, loss.detach().cpu().numpy(), fin - inicio, fecha(), info.optim, info.ancho, info.largo, 0, 0)
         # backward
         optimizer.zero_grad()
         scaler.scale(loss).backward()
@@ -158,7 +159,7 @@ def main():
     scaler = torch.cuda.amp.GradScaler()
     
     for epoch in notebook.tqdm(range(NUM_EPOCHS), desc = ' General'):
-        info.iteración = epoch
+        info.it = epoch
         train_fn(train_loader, model, optimizer, loss_fn, scaler,info)
         
 

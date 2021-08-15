@@ -19,7 +19,7 @@ def generador_nombre(datos,
                      largo, 
                      batch,
                      aumento_datos = True,
-                     optimización = 'Adam', 
+                     optim= 'Adam', 
                      fech = False,
                      n_clases = 2):
   if aumento_datos:
@@ -30,7 +30,7 @@ def generador_nombre(datos,
     f = fecha()+'-'
   else:
     f = ''
-  nombre = datos  + '-' + f + str(ancho) + 'x'+str(largo) +'-'+str(batch) + '-'+str(a_d) + '-' + str(optimización)+'-'+str(n_clases)+'_clases'
+  nombre = datos  + '-' + f + str(ancho) + 'x'+str(largo) +'-'+str(batch) + '-'+str(a_d) + '-' + str(optim)+'-'+str(n_clases)+'_clases'
   return  nombre
 def save_checkpoint(state, filename="lits.pth.tar"):
     print("=> Saving checkpoint")
@@ -188,7 +188,7 @@ class informe():
     self.optim = op
     self.ancho = an
     self.largo = la
-    self.iteración = it
+    self.it = it
 
 
 
