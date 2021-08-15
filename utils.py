@@ -11,6 +11,8 @@ from torch.utils.data import DataLoader
 import time as t
 import pandas as pd
 from tqdm import tqdm, notebook
+import numpy as np
+
 t.strftime("%H:%M:%S")
 def fecha():
   return t.strftime("%d/%m/%y,%H:%M:%S")

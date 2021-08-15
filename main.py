@@ -13,6 +13,7 @@ import torch.nn as nn
 import torch.optim as optim
 import pandas as pd
 from basededatos import LiTS
+import time as t
 
 from model_unet import UNET
 from utils import (
