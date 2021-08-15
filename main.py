@@ -4,7 +4,6 @@ Created on Wed Aug 11 18:07:42 2021
 
 @author: Miguel
 """
-!pip install albumentations
 import torch
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
