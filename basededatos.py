@@ -11,6 +11,7 @@ from torch.utils.data import Dataset
 import numpy as np
 import nibabel as nib
 from tqdm import tqdm, notebook
+import torch
 class LiTS(Dataset):
     def __init__(self, image_dir, mask_dir, transform=None):
         self.image_dir = image_dir # directorio de los volumenes en formato string
