@@ -25,8 +25,6 @@ from utils import (
     generador_nombre,
     informe,
     fecha
-    
-    
 )
 
 # Hyperparameters etc.
