@@ -50,15 +50,15 @@ VAL_MASK_DIR = "/content/validacion/seg"
 
 #__________guardar información sobre el entrenamiento___________________________
 
-model = 'UNET'
+mode = 'UNET'
 data = 'LiTS'
 shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
 batch = BATCH_SIZE
 ad = 'AD' # data aumentation
-optim = 'Adam'
+opti = 'Adam'
 nclass = 2
 
-nombre = generador_nombre(model, data, shape, batch, ad, optim, nclass)
+nombre = generador_nombre(mode, data, shape, batch, ad, opti, nclass)
 DIR = '/content/drive/MyDrive/SOFTWARE_TT/datos/LiTS/'
 
 CHECK_P_FILENAME = DIR + nombre + ".pth.tar"
