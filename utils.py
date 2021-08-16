@@ -16,24 +16,12 @@ import numpy as np
 t.strftime("%H:%M:%S")
 def fecha():
   return t.strftime("%d/%m/%y,%H:%M:%S")
-def generador_nombre(datos,
-                     ancho, 
-                     largo, 
-                     batch,
-                     aumento_datos = True,
-                     optim= 'Adam', 
-                     fech = False,
-                     n_clases = 2):
-  if aumento_datos:
-    a_d = 'AD'
-  else:
-    a_d = 'NAD'
-  if fech:
-    f = fecha()+'-'
-  else:
-    f = ''
-  nombre = datos  + '-' + f + str(ancho) + 'x'+str(largo) +'-'+str(batch) + '-'+str(a_d) + '-' + str(optim)+'-'+str(n_clases)+'_clases'
-  return  nombre
+
+def generador_nombre(model, data, shape, batch, ad, optim, nclass):
+  nombre = '{0}_{1}_{2}x{3}_{4}_{5}_{6}_{7}C'.format(model, data, shape[0],shape[1], batch, ad, optim, nclass)
+  return nombre
+           
+  
 def save_checkpoint(state, filename="lits.pth.tar"):
     print("=> Saving checkpoint")
     torch.save(state, filename)
@@ -133,7 +121,7 @@ def check_accuracy(loader, model, info, device="cuda"):
     model.eval()
     with torch.no_grad():
         c = 0
-        loader = notebook.tqdm(loader,desc= 'Checking accurrancy')
+        loader = notebook.tqdm(loader,desc= '=> Checking accurrancy')
         
         for x, y in loader:
             inicio =t.time()
@@ -145,52 +133,49 @@ def check_accuracy(loader, model, info, device="cuda"):
             
             preds = torch.sigmoid(model(x))
             preds = (preds > 0.5).float()
-            preds = preds.reshape_as(y)
             numpy_y = y.detach().cpu().numpy()
             numpy_preds = preds.detach().cpu().numpy()
             dice = dice_score(numpy_y, numpy_preds)
             acc = accurrancy(numpy_y,numpy_preds)
-            fin = t.time()
-            info.agrega(c, 0, fin-inicio, fecha(), info.optim, info.ancho, info.largo, dice, acc)
+
+            info.agrega(0, dice, acc)
             
             
           
 
 import os
 
+import pandas as pd
+import numpy as np
 class informe():
-  def __init__(self, dir,nombre):
-    print(dir,nombre)
+  def __init__(self, dir,nombre, lr):
     self.dir = dir
-    self.nombre = nombre
-    if nombre in os.listdir(self.dir):
-      print('Cargando datos de: '+ self.nombre + ' ...')
-      self.frame = pd.read_csv(str(dir+nombre))#, index_col = 'Iteración')
+    self.nombre = nombre + '.csv'
+    self.id = 0
+    self.lr = lr
+    if self.nombre in os.listdir(self.dir):
+      print('Cargando datos de: '+ self.nombre + '...')
+      self.frame = pd.read_csv(str(self.dir+self.nombre))
+      print('\b Listo!')
+      if self.frame.shape[0] == 0:
+        self.id = 0
+      else:
+        self.id = self.frame.iloc[-1].ID
     else:
-
-      dic = {'Iteración':[], 
-             'Loss':[],
-             'Segundos':[], 
-             'Fecha':[], 
-             'Optim':[],
-             'Ancho':[],
-             'Largo':[],
-             'Dice':[],
-             'Acc':[]}
+      dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'ACC_0':[], 'ACC_1':[]}
       frame = pd.DataFrame(dic)
-      frame.to_csv(str(self.dir+self.nombre), header=True, index = False)
-      print('Creando...'+nombre)
-      self.frame = pd.read_csv(str(self.dir+self.nombre))#, index_col = 'Iteración')
-      print(self.frame)
-  def agrega(self,it, lo, se, fe, op, an, la, di, ac):
-    
-    dic = {'Iteración':it, 'Loss':lo, 'Segundos':se, 'Fecha':fe, 'Optim':op,'Ancho':an,'Largo':la,'Dice':di,'Acc':ac}
+      frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
+      print('Creando: '+ self.nombre)
+      self.frame = pd.read_csv(str(self.dir+self.nombre))
+      print('\b Listo!')
+  def agrega(self, loss, dice, acc, lr = 'same'):
+    if (lr == 'same'): lr = self.lr
+    self.id = self.id + 1
+
+    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'ACC_0':acc[0], 'ACC_1':acc[1]}
     self.frame = self.frame.append(dic, ignore_index = True)
     self.frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
-    self.optim = op
-    self.ancho = an
-    self.largo = la
-    self.it = it
+ 
 
 
 

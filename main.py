@@ -49,33 +49,24 @@ VAL_IMG_DIR = "/content/validacion/vol"
 VAL_MASK_DIR = "/content/validacion/seg"
 
 #__________guardar información sobre el entrenamiento___________________________
-DATOS = 'UNET-Lits'
-FECHA = fecha()
-D_A = True
-OPTIM = 'Adam'
-n_clases = 2
 
+model = 'UNET'
+data = 'LiTS'
+shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
+batch = BATCH_SIZE
+ad = 'AD' # data aumentation
+optim = 'Adam'
+nclass = 2
 
-nombre = generador_nombre(datos = DATOS,
-                          ancho = IMAGE_HEIGHT, 
-                          largo = IMAGE_WIDTH,
-                          batch = BATCH_SIZE, 
-                          aumento_datos = D_A, 
-                          optim = OPTIM,
-                          fech = False,
-                          n_clases = n_clases)
-print(nombre)
+nombre = generador_nombre(model, data, shape, batch, ad, optim, nclass)
 DIR = '/content/drive/MyDrive/SOFTWARE_TT/datos/LiTS/'
 
 CHECK_P_FILENAME = DIR + nombre + ".pth.tar"
-INFO_FILENAME =  nombre + ".csv"
+INFO_FILENAME =  nombre
 
-info = informe(DIR, INFO_FILENAME)
-info.optim = OPTIM
-info.ancho = IMAGE_HEIGHT
-info.largo = IMAGE_WIDTH
+info = informe(DIR, INFO_FILENAME, LEARNING_RATE)
 
-#info.agrega(it,lo,se,fe,op,an.la,di,ac)
+#info.agrega(loss, dice, acc,lr)
 
 def train_fn(loader, model, optimizer, loss_fn, scaler,info):
     loop = notebook.tqdm(loader, desc = '=> Entrenando', leave = False)
@@ -86,15 +77,12 @@ def train_fn(loader, model, optimizer, loss_fn, scaler,info):
         targets = targets.to(device=DEVICE)
         # forward
         with torch.cuda.amp.autocast():
-            inicio = t.time() # Tiempo de ejecución en segundos en el inicio
+            
             predictions = model(data)
-            #predictions = predictions.reshape_as(targets)
-            #targets = targets.reshape_as(predictions)
-            #print(predictions.shape)
-            loss = loss_fn(predictions.float(), targets.float())
-            fin = t.time()
 
-            info.agrega(info.it, loss.detach().cpu().numpy(), fin - inicio, fecha(), info.optim, info.ancho, info.largo, 0, 0)
+            loss = loss_fn(predictions.float(), targets.float())
+            
+            info.agrega(loss.detach().cpu().numpy(), (0,0), (0,0))
         # backward
         optimizer.zero_grad()
         scaler.scale(loss).backward()
