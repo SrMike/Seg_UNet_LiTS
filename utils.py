@@ -192,7 +192,7 @@ class informe():
     if (lr == 'same'): lr = self.lr
     self.id = self.id + 1
 
-    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'JI_0':acc[0], 'JI_1':acc[1]}
+    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0][0], 'DICE_1':dice[1][0], 'JI_0':acc[0][0], 'JI_1':acc[1][0]}
     self.frame = self.frame.append(dic, ignore_index = True)
     self.frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
  
