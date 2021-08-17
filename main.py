@@ -31,12 +31,12 @@ from utils import (
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 16
-NUM_EPOCHS = 10
+NUM_EPOCHS = 20
 NUM_WORKERS = 2
 IMAGE_HEIGHT = 512  # 
 IMAGE_WIDTH =  512  # 
 PIN_MEMORY = True
-LOAD_MODEL = False
+LOAD_MODEL = True
 
 TRAIN_IMG_DIR = "/content/entrenamiento/vol"
 TRAIN_MASK_DIR = "/content/entrenamiento/seg"
@@ -81,7 +81,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler,info):
 
             loss = loss_fn(predictions.float(), targets.float())
             
-            info.agrega(loss.detach().cpu().numpy(), (0,0), (0,0))
+            info.agrega(loss.detach().cpu().numpy(), ([0],[0]), ([0],[0]))
         # backward
         optimizer.zero_grad()
         scaler.scale(loss).backward()
