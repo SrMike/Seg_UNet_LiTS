@@ -31,13 +31,12 @@ from utils import (
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 16
-NUM_EPOCHS = 1
+NUM_EPOCHS = 10
 NUM_WORKERS = 2
 IMAGE_HEIGHT = 512  # 
 IMAGE_WIDTH =  512  # 
 PIN_MEMORY = True
-LOAD_MODEL = True
-
+LOAD_MODEL = False
 
 TRAIN_IMG_DIR = "/content/entrenamiento/vol"
 TRAIN_MASK_DIR = "/content/entrenamiento/seg"
@@ -55,7 +54,7 @@ data = 'LiTS'
 shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
 batch = BATCH_SIZE
 ad = 'AD' # data aumentation
-opti = 'Adam'
+opti = 'ADAM'
 nclass = 2
 
 nombre = generador_nombre(mode, data, shape, batch, ad, opti, nclass)
@@ -145,25 +144,26 @@ def main():
     scaler = torch.cuda.amp.GradScaler()
     
     for epoch in notebook.tqdm(range(NUM_EPOCHS), desc = ' General'):
-        info.it = epoch
-        train_fn(train_loader, model, optimizer, loss_fn, scaler,info)
-        
 
-        # save model
-        checkpoint = {
-            "state_dict": model.state_dict(),
-            "optimizer":optimizer.state_dict(),
-            
-        }
+      info.it = epoch
+      train_fn(train_loader, model, optimizer, loss_fn, scaler,info)
+      
 
-        save_checkpoint(checkpoint,CHECK_P_FILENAME)
-        
-        # check accuracy
-        check_accuracy(val_loader, model, info, device=DEVICE)
+      # save model
+      checkpoint = {
+          "state_dict": model.state_dict(),
+          "optimizer":optimizer.state_dict(),
+          
+      }
 
-        # print some examples to a folder
-        #save_predictions_as_imgs(
-        #    val_loader, model, folder="saved_images/", device=DEVICE    
-        #)
+      save_checkpoint(checkpoint,CHECK_P_FILENAME)
+      
+      # check accuracy
+    check_accuracy(val_loader, model, info, device=DEVICE)
+
+      # print some examples to a folder
+      #save_predictions_as_imgs(
+      #    val_loader, model, folder="saved_images/", device=DEVICE    
+      #)
 if __name__ == "__main__":
     main()

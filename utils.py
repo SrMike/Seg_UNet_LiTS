@@ -92,7 +92,7 @@ def dice_score(target, prediction):
     dice[i] = (2 * (preds * y).sum()) / ((preds + y).sum() + 1e-8)
   return dice
 
-def accurrancy(target, prediction):
+def jaccard_index(target, prediction):
   if type(target) == torch.Tensor:
     target = target.long()
   else:
@@ -101,6 +101,26 @@ def accurrancy(target, prediction):
     prediction = prediction.long()
   else:
     prediction = np.int32(prediction)
+  lote, canales, fil, col = target.shape
+  ji = np.zeros([canales,1])
+  for i in range(canales):
+    p = prediction[:,i,:,:]
+    t = target[:,i,:,:]
+
+    inter = (t*p).sum()
+    union = t.sum()+p.sum()-inter + 1e-8
+    ji[i] = inter/union
+  return ji
+
+#def accurrancy(target, prediction):
+#  if type(target) == torch.Tensor:
+#    target = target.long()
+#  else:
+#    target = np.int32(target)
+#  if type(prediction) == torch.Tensor:
+#    prediction = prediction.long()
+#  else:
+#    prediction = np.int32(prediction)
 
   #target y prediction tienen las mismas dimenciones [lote, canales, filas, columnas]
   bach,clases,fil,col = target.shape
@@ -136,9 +156,9 @@ def check_accuracy(loader, model, info, device="cuda"):
             numpy_y = y.detach().cpu().numpy()
             numpy_preds = preds.detach().cpu().numpy()
             dice = dice_score(numpy_y, numpy_preds)
-            acc = accurrancy(numpy_y,numpy_preds)
+            ji = jaccard_index(numpy_y,numpy_preds)
 
-            info.agrega(0, dice, acc)
+            info.agrega(0, dice, ji)
             
             
           
@@ -162,7 +182,7 @@ class informe():
       else:
         self.id = self.frame.iloc[-1].ID
     else:
-      dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'ACC_0':[], 'ACC_1':[]}
+      dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'JI_0':[], 'JI_1':[]}
       frame = pd.DataFrame(dic)
       frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
       print('Creando: '+ self.nombre)
@@ -172,7 +192,7 @@ class informe():
     if (lr == 'same'): lr = self.lr
     self.id = self.id + 1
 
-    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'ACC_0':acc[0], 'ACC_1':acc[1]}
+    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'JI_0':acc[0], 'JI_1':acc[1]}
     self.frame = self.frame.append(dic, ignore_index = True)
     self.frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
  
