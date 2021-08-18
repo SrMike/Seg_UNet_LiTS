@@ -56,7 +56,7 @@ class LiTS(Dataset):
 
     def __getitem__(self, index):
       nlist,idx = np.int16(self.index_array[index])
-      image = self.list_images[nlist].slicer[:,:,idx:idx+1].get_fdata()
+      image = self.list_images[nlist].slicer[:,:,idx-1:idx+2].get_fdata()
       mask = self.list_mask[nlist].slicer[:,:,idx:idx+1].get_fdata()
       #image = image + np.abs(image.min())
       #image = (image/image.max())*255
@@ -103,4 +103,3 @@ class LiTS(Dataset):
       for i in range(min(dic),max(dic)):
         lista.append(dic[i])
       return lista
-
