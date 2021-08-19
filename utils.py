@@ -89,11 +89,12 @@ def dice_score(target, prediction):
   #target y prediction tienen las mismas dimenciones [lote, canales, filas, columnas]
   lote, canales, fil, col = target.shape
 
-  dice = np.zeros([canales,1])
+  #dice = np.zeros([canales,1])
+  dice = []
   for i in range(canales):
     preds = prediction[:,i,:,:]
     y =  target[:,i,:,:]
-    dice[i] = (2 * (preds * y).sum()) / ((preds + y).sum() + 1e-8)
+    dice.append((2 * (preds * y).sum()) / ((preds + y).sum() + 1e-8))
   return dice
 
 def jaccard_index(target, prediction):
@@ -114,14 +115,15 @@ def jaccard_index(target, prediction):
     
   
   lote, canales, fil, col = target.shape
-  ji = np.zeros([canales,1])
+  #ji = np.zeros([canales,1])
+  ji = []
   for i in range(canales):
     p = prediction[:,i,:,:]
     t = target[:,i,:,:]
 
     inter = (t*p).sum()
     union = t.sum()+p.sum()-inter + 1e-8
-    ji[i] = inter/union
+    ji.append(inter/union)
   return ji
 
 #def accurrancy(target, prediction):
@@ -170,7 +172,7 @@ def check_accuracy(loader, model, info, device="cuda"):
             for i in range(a):
               dice = dice_score(numpy_y[i,:,:,:], numpy_preds[i,:,:,:])
               ji = jaccard_index(numpy_y[i,:,:,:],numpy_preds[i,:,:,:])
-              info.agrega(0, dice, ji)
+              info.agrega(-1, dice, ji)
             
             
           
@@ -179,12 +181,15 @@ import os
 
 import pandas as pd
 import numpy as np
+
 class informe():
-  def __init__(self, dir,nombre, lr):
+  def __init__(self, dir,nombre, lr = 0):
+
     self.dir = dir
     self.nombre = nombre + '.csv'
     self.id = 0
     self.lr = lr
+    self.id_val = 0
     if self.nombre in os.listdir(self.dir):
       print('Cargando datos de: '+ self.nombre + '...')
       self.frame = pd.read_csv(str(self.dir+self.nombre))
@@ -193,8 +198,10 @@ class informe():
         self.id = 0
       else:
         self.id = self.frame.iloc[-1].ID
+        self.id_val = self.frame['VALIDACIÓN'].max()
+        
     else:
-      dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'JI_0':[], 'JI_1':[]}
+      dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'JI_0':[], 'JI_1':[],'VALIDACIÓN':[]}
       frame = pd.DataFrame(dic)
       frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
       print('Creando: '+ self.nombre)
@@ -203,10 +210,21 @@ class informe():
   def agrega(self, loss, dice, acc, lr = 'same'):
     if (lr == 'same'): lr = self.lr
     self.id = self.id + 1
+    if (loss == -1)and(self.frame[self.frame['ID'] == info.id-1].LOSS.values[0] != -1):
+      self.id_val = self.id_val + 1
+      self.val = self.id_val
+    elif (loss != -1):
+      self.val = 0
 
-    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0][0], 'DICE_1':dice[1][0], 'JI_0':acc[0][0], 'JI_1':acc[1][0]}
+    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'JI_0':acc[0], 'JI_1':acc[1],'VALIDACIÓN':self.val}
     self.frame = self.frame.append(dic, ignore_index = True)
     self.frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
+  def guarda_graficas(self):
+    return 0
+  def genera_graficas(self):
+    
+    return 0
+
  
 
 
