@@ -74,6 +74,10 @@ def get_loaders(
 
     return train_loader, val_loader
 def dice_score(target, prediction):
+  if len(target.shape) == 3:
+    target.unsqueeze_(0)
+    prediction.unsqueeze_(0)
+
   if type(target) == torch.Tensor:
     target = target.long()
   else:
@@ -93,6 +97,12 @@ def dice_score(target, prediction):
   return dice
 
 def jaccard_index(target, prediction):
+  if len(target.shape) == 3:
+    target.unsqueeze_(0)
+    prediction.unsqueeze_(0)
+
+  
+
   if type(target) == torch.Tensor:
     target = target.long()
   else:
@@ -101,6 +111,8 @@ def jaccard_index(target, prediction):
     prediction = prediction.long()
   else:
     prediction = np.int32(prediction)
+    
+  
   lote, canales, fil, col = target.shape
   ji = np.zeros([canales,1])
   for i in range(canales):
@@ -123,13 +135,13 @@ def jaccard_index(target, prediction):
 #    prediction = np.int32(prediction)
 
   #target y prediction tienen las mismas dimenciones [lote, canales, filas, columnas]
-  bach,clases,fil,col = target.shape
-  acc = np.zeros([clases,1])
-  for i in range(clases):
-    n_correct = np.sum(target[:,i,:,:])
-    n_pred = np.sum(prediction[:,i,:,:])+ 1e-8
-    acc[i] = (n_pred/n_correct)*100
-  return acc
+#  bach,clases,fil,col = target.shape
+#  acc = np.zeros([clases,1])
+#  for i in range(clases):
+#    n_correct = np.sum(target[:,i,:,:])
+#    n_pred = np.sum(prediction[:,i,:,:])+ 1e-8
+#    acc[i] = (n_pred/n_correct)*100
+#  return acc
 def check_accuracy(loader, model, info, device="cuda"):
     
     num_correct_1 = 0
@@ -153,12 +165,12 @@ def check_accuracy(loader, model, info, device="cuda"):
             
             preds = torch.sigmoid(model(x))
             preds = (preds > 0.5).float()
-            numpy_y = y.detach().cpu().numpy()
-            numpy_preds = preds.detach().cpu().numpy()
-            dice = dice_score(numpy_y, numpy_preds)
-            ji = jaccard_index(numpy_y,numpy_preds)
+            a,b,c,d = preds.shape
 
-            info.agrega(0, dice, ji)
+            for i in range(a):
+              dice = dice_score(numpy_y[i,:,:,:], numpy_preds[i,:,:,:])
+              ji = jaccard_index(numpy_y[i,:,:,:],numpy_preds[i,:,:,:])
+              info.agrega(0, dice, ji)
             
             
           
