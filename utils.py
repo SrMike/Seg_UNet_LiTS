@@ -198,10 +198,10 @@ class informe():
         self.id = 0
       else:
         self.id = self.frame.iloc[-1].ID
-        self.id_val = self.frame['VALIDACIÓN'].max()
+        self.id_val = self.frame['VAL'].max()
         
     else:
-      dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'JI_0':[], 'JI_1':[],'VALIDACIÓN':[]}
+      dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'JI_0':[], 'JI_1':[],'VAL':[]}
       frame = pd.DataFrame(dic)
       frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
       print('Creando: '+ self.nombre)
@@ -216,7 +216,7 @@ class informe():
     elif (loss != -1):
       self.val = 0
 
-    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'JI_0':acc[0], 'JI_1':acc[1],'VALIDACIÓN':self.val}
+    dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'JI_0':acc[0], 'JI_1':acc[1],'VAL':self.val}
     self.frame = self.frame.append(dic, ignore_index = True)
     self.frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
   def guarda_graficas(self):
