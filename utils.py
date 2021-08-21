@@ -170,8 +170,8 @@ def check_accuracy(loader, model, info, device="cuda"):
             a,b,c,d = preds.shape
 
             for i in range(a):
-              dice = dice_score(numpy_y[i,:,:,:], numpy_preds[i,:,:,:])
-              ji = jaccard_index(numpy_y[i,:,:,:],numpy_preds[i,:,:,:])
+              dice = dice_score(y[i,:,:,:], preds[i,:,:,:])
+              ji = jaccard_index(y[i,:,:,:],preds[i,:,:,:])
               info.agrega(-1, dice, ji)
             
             
