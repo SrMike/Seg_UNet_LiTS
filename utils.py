@@ -181,18 +181,39 @@ import os
 
 import pandas as pd
 import numpy as np
-
+from utils import *
 class informe():
-  def __init__(self, dir,nombre, lr = 0):
+  def __init__(self,nombre = 'name', lr = 0, dir = 'no_dir'):
 
     self.dir = dir
-    self.nombre = nombre + '.csv'
+    # La información se guardará en 2 carpetas
+    # trained_models guarda los modelos entrenados (checkpoint)
+    # training_data guarda la información del entrenamiento.
+
+    self.trained_model_folder = 'trained_models'
+    self.training_data_folder = 'training_data'
+
+    self.nombre = self.training_data_folder + '/' + nombre + '.csv'
+    self.checkpoint_name = self.trained_model_folder + '/'+ nombre + '.pth.tar'
+
     self.id = 0
     self.lr = lr
     self.id_val = 0
-    if self.nombre in os.listdir(self.dir):
+
+    list_dir = os.listdir()
+    # Crea los folders si no existen.
+    if not(self.trained_model_folder in list_dir):
+      os.mkdir(self.trained_model_folder)
+    
+    if not(self.training_data_folder in list_dir):
+      os.mkdir(self.training_data_folder)
+      
+
+    
+    if nombre + '.csv' in os.listdir(self.training_data_folder):
+
       print('Cargando datos de: '+ self.nombre + '...')
-      self.frame = pd.read_csv(str(self.dir+self.nombre))
+      self.frame = pd.read_csv(str(self.nombre))
       print('\b Listo!')
       if self.frame.shape[0] == 0:
         self.id = 0
@@ -203,14 +224,14 @@ class informe():
     else:
       dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'JI_0':[], 'JI_1':[],'VAL':[]}
       frame = pd.DataFrame(dic)
-      frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
+      frame.to_csv(str(self.nombre), header = True, index = False)
       print('Creando: '+ self.nombre)
-      self.frame = pd.read_csv(str(self.dir+self.nombre))
+      self.frame = pd.read_csv(str(self.nombre))
       print('\b Listo!')
   def agrega(self, loss, dice, acc, lr = 'same'):
     if (lr == 'same'): lr = self.lr
     self.id = self.id + 1
-    if (loss == -1)and(self.frame[self.frame['ID'] == info.id-1].LOSS.values[0] != -1):
+    if (loss == -1)and(self.frame[self.frame['ID'] == self.id-1].LOSS.values[0] != -1):
       self.id_val = self.id_val + 1
       self.val = self.id_val
     elif (loss != -1):
@@ -218,7 +239,20 @@ class informe():
 
     dic = {'ID':self.id, 'FECHA':fecha(), 'LOSS':loss,'LR':lr,'DICE_0':dice[0], 'DICE_1':dice[1], 'JI_0':acc[0], 'JI_1':acc[1],'VAL':self.val}
     self.frame = self.frame.append(dic, ignore_index = True)
-    self.frame.to_csv(str(self.dir + self.nombre), header = True, index = False)
+    
+    if (loss == -1): 
+      self.frame.to_csv(str(self.nombre), header = True, index = False)
+
+  def checkpoint(self, model, optimizer):
+    checkpoint = {
+          "state_dict": model.state_dict(),
+          "optimizer":optimizer.state_dict(),
+          
+      }
+    print("=> Saving checkpoint")
+    torch.save(checkpoint, self.checkpoint_name)
+    self.frame.to_csv(str(self.nombre), header = True, index = False)
+
   def guarda_graficas(self):
     return 0
   def genera_graficas(self):
