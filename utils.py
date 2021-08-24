@@ -256,7 +256,8 @@ class informe():
   def load_checkpoint(self, model):
     try: 
       checkpoint = torch.load(self.checkpoint_name)
-    except: FileNotFoundError:
+      model.load_state_dict(checkpoint["state_dict"])
+    except FileNotFoundError:
       print('El modelo se entrenará desde 0 ')
     
   def guarda_graficas(self):
