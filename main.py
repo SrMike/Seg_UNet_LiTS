@@ -81,7 +81,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler,info):
 
             loss = loss_fn(predictions.float(), targets.float())
             
-            info.agrega(loss.detach().cpu().numpy(), ([0],[0]), ([0],[0]))
+            info.agrega(loss.detach().cpu().numpy(), (0,0), (0,0))
         # backward
         optimizer.zero_grad()
         scaler.scale(loss).backward()
@@ -136,9 +136,9 @@ def main():
         PIN_MEMORY,
     )
     
-    if LOAD_MODEL:
-      load_checkpoint(torch.load(CHECK_P_FILENAME), model)
-    
+    #if LOAD_MODEL:
+    #  load_checkpoint(torch.load(CHECK_P_FILENAME), model)
+    info.load_checkpoint(model)
     #check_accuracy(val_loader, model, device=DEVICE)
     
     scaler = torch.cuda.amp.GradScaler()

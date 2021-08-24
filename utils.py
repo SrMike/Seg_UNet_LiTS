@@ -253,6 +253,12 @@ class informe():
     torch.save(checkpoint, self.checkpoint_name)
     self.frame.to_csv(str(self.nombre), header = True, index = False)
 
+  def load_checkpoint(self, model):
+    try: 
+      checkpoint = torch.load(self.checkpoint_name)
+    except: FileNotFoundError:
+      print('El modelo se entrenará desde 0 ')
+    
   def guarda_graficas(self):
     return 0
   def genera_graficas(self):
