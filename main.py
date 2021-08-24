@@ -150,13 +150,8 @@ def main():
       
 
       # save model
-      checkpoint = {
-          "state_dict": model.state_dict(),
-          "optimizer":optimizer.state_dict(),
-          
-      }
-
-      save_checkpoint(checkpoint,CHECK_P_FILENAME)
+    
+      info.checkpoint(model, optimizer)
       
       # check accuracy
     check_accuracy(val_loader, model, info, device=DEVICE)
