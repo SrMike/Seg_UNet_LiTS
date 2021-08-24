@@ -189,12 +189,19 @@ class informe():
     # La información se guardará en 2 carpetas
     # trained_models guarda los modelos entrenados (checkpoint)
     # training_data guarda la información del entrenamiento.
-
+    
     self.trained_model_folder = 'trained_models'
     self.training_data_folder = 'training_data'
 
-    self.nombre = self.training_data_folder + '/' + nombre + '.csv'
-    self.checkpoint_name = self.trained_model_folder + '/'+ nombre + '.pth.tar'
+    if (dir != 'no_dir'):
+
+
+
+      self.nombre =  dir + self.training_data_folder + '/' + nombre + '.csv'
+      self.checkpoint_name = dir +  self.trained_model_folder + '/'+ nombre + '.pth.tar'
+    else: 
+      self.nombre =  self.training_data_folder + '/' + nombre + '.csv'
+      self.checkpoint_name = self.trained_model_folder + '/'+ nombre + '.pth.tar'
 
     self.id = 0
     self.lr = lr
