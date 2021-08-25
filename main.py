@@ -15,7 +15,7 @@ import pandas as pd
 from basededatos import LiTS
 import time as t
 
-from model import UNET
+from model import UNET, TC_UNET
 from utils import (
     load_checkpoint,
     save_checkpoint,
@@ -31,10 +31,10 @@ from utils import (
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 16
-NUM_EPOCHS = 1
+NUM_EPOCHS = 5
 NUM_WORKERS = 2
-IMAGE_HEIGHT = 512  # 
-IMAGE_WIDTH =  512  # 
+IMAGE_HEIGHT = 256  # 
+IMAGE_WIDTH =  256  # 
 PIN_MEMORY = True
 LOAD_MODEL = True
 
@@ -63,7 +63,7 @@ DIR = '/content/drive/MyDrive/SOFTWARE_TT/datos/LiTS/'
 CHECK_P_FILENAME = DIR + nombre + ".pth.tar"
 INFO_FILENAME =  nombre
 
-info = informe(INFO_FILENAME, LEARNING_RATE)
+info = informe(INFO_FILENAME, LEARNING_RATE, DIR)
 
 #info.agrega(loss, dice, acc,lr)
 

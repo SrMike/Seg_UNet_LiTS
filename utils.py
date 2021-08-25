@@ -169,11 +169,13 @@ def check_accuracy(loader, model, info, device="cuda"):
             preds = (preds > 0.5).float()
             a,b,c,d = preds.shape
 
-            for i in range(a):
-              dice = dice_score(y[i,:,:,:], preds[i,:,:,:])
-              ji = jaccard_index(y[i,:,:,:],preds[i,:,:,:])
-              info.agrega(-1, dice, ji)
-            
+            #for i in notebook.tqdm(range(a),desc = '=> Lote: '):
+            #  dice = dice_score(y[i,:,:,:], preds[i,:,:,:])
+            #  ji = jaccard_index(y[i,:,:,:],preds[i,:,:,:])
+            #  info.agrega(-1, dice, ji)
+            dice = dice_score(y, preds)
+            ji = jaccard_index(y,preds)
+            info.agrega(-1, dice, ji)
             
           
 
@@ -208,9 +210,11 @@ class informe():
     
     # Crea los folders si no existen.
     if not(self.trained_model_folder in os.listdir()):
+      print('Creando: ', self.trained_model_folder)
       os.mkdir(self.trained_model_folder)
 
     if not(self.training_data_folder in os.listdir()):
+      print('Creando: ', self.training_data_folder)
       os.mkdir(self.training_data_folder)
       
 
