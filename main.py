@@ -31,10 +31,10 @@ from utils import (
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 16
-NUM_EPOCHS = 0
+NUM_EPOCHS = 5
 NUM_WORKERS = 2
-IMAGE_HEIGHT = 256  # 
-IMAGE_WIDTH =  256  # 
+IMAGE_HEIGHT = 448  # 
+IMAGE_WIDTH =  448  # 
 PIN_MEMORY = True
 LOAD_MODEL = True
 
@@ -49,7 +49,7 @@ VAL_MASK_DIR = "/content/validacion/seg"
 
 #__________guardar información sobre el entrenamiento___________________________
 
-mode = 'UNET'
+mode = 'TC_UNET'
 data = 'LiTS'
 shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
 batch = BATCH_SIZE
@@ -118,7 +118,7 @@ def main():
         ],
     )
     
-    model = UNET(in_channels=3, out_channels=2).to(DEVICE)
+    model = TC_UNET(in_channels=3, out_channels=2).to(DEVICE)
 
     loss_fn = nn.BCEWithLogitsLoss()
 
