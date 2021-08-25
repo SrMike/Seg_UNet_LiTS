@@ -175,7 +175,7 @@ def check_accuracy(loader, model, info, device="cuda"):
             #  info.agrega(-1, dice, ji)
             dice = dice_score(y, preds)
             ji = jaccard_index(y,preds)
-            info.agrega(-1, dice, ji)
+            info.agrega(-1, dice.detach().cpu().numpy(), ji.detach().cpu().numpy())
             
           
 
@@ -192,6 +192,7 @@ class informe():
     self.id = 0
     self.lr = lr
     self.id_val = 0
+    self.val = 0
     # La información se guardará en 2 carpetas
     # trained_models guarda los modelos entrenados (checkpoint)
     # training_data guarda la información del entrenamiento.
