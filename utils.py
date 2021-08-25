@@ -184,8 +184,12 @@ import numpy as np
 from utils import *
 class informe():
   def __init__(self,nombre = 'name', lr = 0, dir = 'no_dir'):
-
+    print(os.listdir())
     self.dir = dir
+    self.nombre = nombre
+    self.id = 0
+    self.lr = lr
+    self.id_val = 0
     # La información se guardará en 2 carpetas
     # trained_models guarda los modelos entrenados (checkpoint)
     # training_data guarda la información del entrenamiento.
@@ -193,34 +197,28 @@ class informe():
     self.trained_model_folder = 'trained_models'
     self.training_data_folder = 'training_data'
 
-    if (dir != 'no_dir'):
-
-
-
-      self.nombre =  dir + self.training_data_folder + '/' + nombre + '.csv'
-      self.checkpoint_name = dir +  self.trained_model_folder + '/'+ nombre + '.pth.tar'
-    else: 
-      self.nombre =  self.training_data_folder + '/' + nombre + '.csv'
-      self.checkpoint_name = self.trained_model_folder + '/'+ nombre + '.pth.tar'
-
-    self.id = 0
-    self.lr = lr
-    self.id_val = 0
-
-    list_dir = os.listdir()
-    # Crea los folders si no existen.
-    if not(self.trained_model_folder in list_dir):
-      os.mkdir(self.trained_model_folder)
+    if dir != 'no_dir':  
+      os.chdir(dir)
+    self.trained_model_route = self.trained_model_folder + '/'
+    self.training_data_route = self.training_data_folder + '/'
     
-    if not(self.training_data_folder in list_dir):
+    self.trained_model_file = self.trained_model_route + nombre + '.pth.tar'
+    self.training_data_file = self.training_data_route + nombre + '.csv'
+
+    
+    # Crea los folders si no existen.
+    if not(self.trained_model_folder in os.listdir()):
+      os.mkdir(self.trained_model_folder)
+
+    if not(self.training_data_folder in os.listdir()):
       os.mkdir(self.training_data_folder)
       
 
     
     if nombre + '.csv' in os.listdir(self.training_data_folder):
 
-      print('Cargando datos de: '+ self.nombre + '...')
-      self.frame = pd.read_csv(str(self.nombre))
+      print('Cargando datos de: '+ self.training_data_file + '...')
+      self.frame = pd.read_csv(self.training_data_file)
       print('\b Listo!')
       if self.frame.shape[0] == 0:
         self.id = 0
@@ -231,9 +229,9 @@ class informe():
     else:
       dic = {'ID':[], 'FECHA':[], 'LOSS':[],'LR':[],'DICE_0':[], 'DICE_1':[], 'JI_0':[], 'JI_1':[],'VAL':[]}
       frame = pd.DataFrame(dic)
-      frame.to_csv(str(self.nombre), header = True, index = False)
+      frame.to_csv(self.training_data_file, header = True, index = False)
       print('Creando: '+ self.nombre)
-      self.frame = pd.read_csv(str(self.nombre))
+      self.frame = pd.read_csv(self.training_data_file)
       print('\b Listo!')
   def agrega(self, loss, dice, acc, lr = 'same'):
     if (lr == 'same'): lr = self.lr
@@ -248,7 +246,7 @@ class informe():
     self.frame = self.frame.append(dic, ignore_index = True)
     
     if (loss == -1): 
-      self.frame.to_csv(str(self.nombre), header = True, index = False)
+      self.frame.to_csv(self.training_data_file, header = True, index = False)
 
   def checkpoint(self, model, optimizer):
     checkpoint = {
@@ -257,12 +255,12 @@ class informe():
           
       }
     print("=> Saving checkpoint")
-    torch.save(checkpoint, self.checkpoint_name)
-    self.frame.to_csv(str(self.nombre), header = True, index = False)
+    torch.save(checkpoint, self.trained_model_file)
+    self.frame.to_csv(self.training_data_file, header = True, index = False)
 
   def load_checkpoint(self, model):
     try: 
-      checkpoint = torch.load(self.checkpoint_name)
+      checkpoint = torch.load(self.trained_model_file)
       model.load_state_dict(checkpoint["state_dict"])
     except FileNotFoundError:
       print('El modelo se entrenará desde 0 ')
