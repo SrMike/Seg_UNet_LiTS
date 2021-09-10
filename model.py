@@ -8,6 +8,18 @@ import torch
 import torch.nn as nn
 import torchvision.transforms.functional as TF
 
+class SimpleConv(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(DoubleConv, self).__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, 3, 1, 1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DoubleConv, self).__init__()
@@ -171,7 +183,9 @@ class SEGNET(nn.Module):
         self.ups.append(TripleConv(features[3],features[2]))
         self.ups.append(TripleConv(features[2],features[1]))
         self.ups.append(DoubleConv(features[1],features[0]))
-        self.ups.append(DoubleConv(features[0], out_channels))
+        self.ups.append(SimpleConv(features[0], features[0]))
+
+        self.final_conv = nn.Conv2d(features[0], out_channels)
         # Down part of UNET
         #for feature in features:
         #    self.downs.append(DoubleConv(in_channels, feature))
@@ -205,7 +219,7 @@ class SEGNET(nn.Module):
         for i,up in enumerate(self.ups):
           x = self.unpool(x,indices[i])
           x = up(x)
-          
+        x = final_conv(x)
         #for idx in range(0, len(self.ups), 2):
             #x = self.ups[idx](x)
             #skip_connection = skip_connections[idx//2]
