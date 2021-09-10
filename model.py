@@ -219,7 +219,7 @@ class SEGNET(nn.Module):
         for i,up in enumerate(self.ups):
           x = self.unpool(x,indices[i])
           x = up(x)
-        x = final_conv(x)
+        x = self.final_conv(x)
         #for idx in range(0, len(self.ups), 2):
             #x = self.ups[idx](x)
             #skip_connection = skip_connections[idx//2]
