@@ -10,7 +10,7 @@ import torchvision.transforms.functional as TF
 
 class SimpleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
-        super(DoubleConv, self).__init__()
+        super(SimpleConv, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, 3, 1, 1, bias=False),
             nn.BatchNorm2d(out_channels),
@@ -185,7 +185,7 @@ class SEGNET(nn.Module):
         self.ups.append(DoubleConv(features[1],features[0]))
         self.ups.append(SimpleConv(features[0], features[0]))
 
-        self.final_conv = nn.Conv2d(features[0], out_channels)
+        self.final_conv = nn.Conv2d(features[0], out_channels, kernel_size = 1)
         # Down part of UNET
         #for feature in features:
         #    self.downs.append(DoubleConv(in_channels, feature))
