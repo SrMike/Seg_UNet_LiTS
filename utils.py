@@ -175,7 +175,7 @@ def check_accuracy(loader, model, info, device="cuda"):
             #  info.agrega(-1, dice, ji)
             dice = dice_score(y, preds)
             ji = jaccard_index(y,preds)
-            info.agrega(-1, (dice[0].detach().cpu().numpy(),dice[1].detach().cpu().numpy()), (ji[0].detach().cpu().numpy(),ji[0].detach().cpu().numpy()))
+            info.agrega(-1, (dice[0].detach().cpu().numpy(),dice[1].detach().cpu().numpy()), (ji[0].detach().cpu().numpy(),ji[1].detach().cpu().numpy()))
             
           
 
