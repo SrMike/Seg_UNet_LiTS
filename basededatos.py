@@ -17,7 +17,7 @@ class LiTS(Dataset):
       self.image_dir = image_dir # directorio de los volumenes en formato string
       self.mask_dir = mask_dir   # directorio de las mascaras en formato string
       self.transform = transform
-      self.index_array = 'None'
+      self.index_array = np.zeros([0,0])
 
       if 'index_array' in os.listdir(image_dir):
         print('Cargando indices... ')
@@ -40,7 +40,7 @@ class LiTS(Dataset):
       self.list_mask = []   # son los segmentos
       self.tamaños = []     # Lista que contiene el número de frames por 
                             # archivo
-
+      
       for i in range(len(self.images)-1): 
         #--- se cargan los archivos " .nii" utilizando nib.load()
         imag = nib.load(self.image_dir + '/' + self.images[i])
@@ -52,12 +52,11 @@ class LiTS(Dataset):
         self.tamaños.append(imag.shape[2])
       #self.total = sum(self.tamaños)
       #=========================================================================
-      # En esta sección se genera self.index_array si no existe
-      if self.index_array == 'None':
+      #==================En esta sección se genera self.index_array si no existe
+      if self.index_array.shape == (0,0):
         print('Generando indices... ')
         self.index_array = np.zeros([sum(self.tamaños),2])
         self.cont = 0
-      
 
         for i in notebook.tqdm(range(len(self.tamaños)), desc= '=> Cargando base de datos', leave = False):
           for j in notebook.tqdm(range(self.tamaños[i]), desc = '=> '+self.images[i], leave = False):
@@ -65,12 +64,15 @@ class LiTS(Dataset):
               self.index_array[self.cont,0] = i
               self.index_array[self.cont,1] = j
               self.cont = self.cont + 1
+        self.index_array = self.index_array[0:self.cont,:]
         np.savetxt(self.image_dir + '/index_array',self.index_array)
+        #print(self.cont, self.index_array.shape)
+        #print(self.index_array[self.cont-1,:])
         print('\b Listo!')
         
 
     def __len__(self):
-        return self.cont
+        return self.index_array.shape[0]
 
     def __getitem__(self, index):
       nlist,idx = np.int16(self.index_array[index])
@@ -99,7 +101,7 @@ class LiTS(Dataset):
           mat[0,:,:] = mask[:,:,0]
           mat[1,:,:] = mask[:,:,1]
           mask = mat
-         
+
       return image, mask
     def obtener_numero(self,nombre):
       a = nombre.find('-')
