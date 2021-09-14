@@ -17,7 +17,7 @@ class LiTS(Dataset):
       self.image_dir = image_dir # directorio de los volumenes en formato string
       self.mask_dir = mask_dir   # directorio de las mascaras en formato string
       self.transform = transform
-      self.index_array = None
+      self.index_array = 'None'
 
       if 'index_array' in os.listdir(image_dir):
         print('Cargando indices... ')
@@ -53,7 +53,7 @@ class LiTS(Dataset):
       #self.total = sum(self.tamaños)
       #=========================================================================
       # En esta sección se genera self.index_array si no existe
-      if self.index_array == None:
+      if self.index_array == 'None':
         print('Generando indices... ')
         self.index_array = np.zeros([sum(self.tamaños),2])
         self.cont = 0
