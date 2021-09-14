@@ -14,42 +14,60 @@ from tqdm import tqdm, notebook
 import torch
 class LiTS(Dataset):
     def __init__(self, image_dir, mask_dir, transform=None):
-        self.image_dir = image_dir # directorio de los volumenes en formato string
-        self.mask_dir = mask_dir   # directorio de las mascaras en formato string
-        self.transform = transform
-        
-        self.images = self.ordena_lista(os.listdir(image_dir)) # lista con los nombres de cada uno
-                                            # de los archivos #volumen-xx.nii
+      self.image_dir = image_dir # directorio de los volumenes en formato string
+      self.mask_dir = mask_dir   # directorio de las mascaras en formato string
+      self.transform = transform
+      self.index_array = None
 
+      if 'index_array' in os.listdir(image_dir):
+        print('Cargando indices... ')
+        self.index_array = np.loadtxt(image_dir + '/index_array') # carga el indice de datos generado previamente
+        list_image_dir = os.listdir(image_dir)
+        list_image_dir.remove('index_array')
+        self.images = self.ordena_lista(list_image_dir) # lista con los nombres de cada uno
+                                                        # de los archivos #volumen-xx.nii
+        print('\b Listo! ')
+      else:
 
-        self.mask = self.ordena_lista(os.listdir(mask_dir))    # lista con ['mascaras-00.nii',...]
-        
-        
-        
-        self.list_images = [] # son los volumenes
-        self.list_mask = []   # son los segmentos
-        self.tamaños = []     # Lista que contiene el número de frames por 
-                              # archivo
+        self.images = self.ordena_lista(os.listdir(image_dir))  # lista con los nombres de cada uno
+                                                                # de los archivos #volumen-xx.nii
 
-        for i in range(len(self.images)-1): 
-          #--- se cargan los archivos " .nii" utilizando nib.load()
-          imag = nib.load(self.image_dir + '/' + self.images[i])
-          mask = nib.load(self.mask_dir + '/' + self.mask[i])
-          #_se guardan en las listas
-          self.list_images.append(imag)
-          self.list_mask.append(mask)
-          #_se consulta el tamaño y se guarda en la lista tamaños
-          self.tamaños.append(imag.shape[2])
-        #self.total = sum(self.tamaños)
+      self.mask = self.ordena_lista(os.listdir(mask_dir))    # lista con ['mascaras-00.nii',...]
+      
+      
+      #====En esta sección se generan las listas que contienen los archivos .nii
+      self.list_images = [] # son los volumenes
+      self.list_mask = []   # son los segmentos
+      self.tamaños = []     # Lista que contiene el número de frames por 
+                            # archivo
+
+      for i in range(len(self.images)-1): 
+        #--- se cargan los archivos " .nii" utilizando nib.load()
+        imag = nib.load(self.image_dir + '/' + self.images[i])
+        mask = nib.load(self.mask_dir + '/' + self.mask[i])
+        #_se guardan en las listas
+        self.list_images.append(imag)
+        self.list_mask.append(mask)
+        #_se consulta el tamaño y se guarda en la lista tamaños
+        self.tamaños.append(imag.shape[2])
+      #self.total = sum(self.tamaños)
+      #=========================================================================
+      # En esta sección se genera self.index_array si no existe
+      if self.index_array == None:
+        print('Generando indices... ')
         self.index_array = np.zeros([sum(self.tamaños),2])
         self.cont = 0
+      
 
         for i in notebook.tqdm(range(len(self.tamaños)), desc= '=> Cargando base de datos', leave = False):
-          for j in notebook.tqdm(range(self.tamaños[i]), desc = self.images[i], leave = False):
+          for j in notebook.tqdm(range(self.tamaños[i]), desc = '=> '+self.images[i], leave = False):
             if self.list_mask[i].slicer[:,:,j:j+1].get_fdata().sum() != 0:
               self.index_array[self.cont,0] = i
               self.index_array[self.cont,1] = j
               self.cont = self.cont + 1
+        np.savetxt(self.image_dir + '/index_array',self.index_array)
+        print('\b Listo!')
+        
 
     def __len__(self):
         return self.cont

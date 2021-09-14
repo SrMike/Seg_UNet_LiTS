@@ -49,7 +49,7 @@ VAL_MASK_DIR = "/content/validacion/seg"
 
 #__________guardar información sobre el entrenamiento___________________________
 
-mode = 'SEGNET'
+mode = 'TC_UNET'
 data = 'LiTS'
 shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
 batch = BATCH_SIZE
@@ -118,7 +118,7 @@ def main():
         ],
     )
     
-    model = SEGNET(in_channels=3, out_channels=2).to(DEVICE)
+    model = TC_UNET(in_channels=3, out_channels=2).to(DEVICE)
 
     loss_fn = nn.BCEWithLogitsLoss()
 
