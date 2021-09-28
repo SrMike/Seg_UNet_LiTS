@@ -83,11 +83,18 @@ class LiTS(Dataset):
       #image = (image/image.max())*255
       #image = np.uint8(image)
       #image = image[:,:,0]
+
       if self.class_dimention:
+
         mat = np.zeros((mask.shape[0], mask.shape[1],2))
         mat[:,:,0] = mask[:,:,0] == 1
         mat[:,:,1] = mask[:,:,0] == 2
-        mask = mat
+      
+      else:
+        mat = np.zeros((mask.shape[0], mask.shape[1]))
+        mat[:,:] = mask[:,:,0]
+        
+      mask = mat
         #img_path = os.path.join(self.image_dir, self.images[index])
         #mask_path = os.path.join(self.mask_dir, self.images[index].replace(".jpg", "_mask.gif"))
         #image = np.array(Image.open(img_path).convert("RGB"))
