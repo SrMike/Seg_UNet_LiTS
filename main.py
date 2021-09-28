@@ -49,7 +49,7 @@ VAL_MASK_DIR = "/content/validacion/seg"
 
 #__________guardar información sobre el entrenamiento___________________________
 
-mode = 'TC_UNET'
+mode = 'UNET'
 data = 'LiTS'
 shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
 batch = BATCH_SIZE
@@ -122,8 +122,8 @@ def main():
 
     loss_fn = nn.BCEWithLogitsLoss()
 
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
+    #optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.SDG(model.parameters(), lr=LEARNING_RATE)
     train_loader, val_loader = get_loaders(
         TRAIN_IMG_DIR,
         TRAIN_MASK_DIR,

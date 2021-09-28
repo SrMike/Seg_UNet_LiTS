@@ -13,10 +13,11 @@ import nibabel as nib
 from tqdm import tqdm, notebook
 import torch
 class LiTS(Dataset):
-    def __init__(self, image_dir, mask_dir, transform=None):
+    def __init__(self, image_dir, mask_dir, transform=None, class_dimention = True):
       self.image_dir = image_dir # directorio de los volumenes en formato string
       self.mask_dir = mask_dir   # directorio de las mascaras en formato string
       self.transform = transform
+      self.class_dimention = class_dimention
       self.index_array = np.zeros([0,0])
 
       if 'index_array' in os.listdir(image_dir):
@@ -82,10 +83,11 @@ class LiTS(Dataset):
       #image = (image/image.max())*255
       #image = np.uint8(image)
       #image = image[:,:,0]
-      mat = np.zeros((mask.shape[0], mask.shape[1],2))
-      mat[:,:,0] = mask[:,:,0] == 1
-      mat[:,:,1] = mask[:,:,0] == 2
-      mask = mat
+      if self.class_dimention:
+        mat = np.zeros((mask.shape[0], mask.shape[1],2))
+        mat[:,:,0] = mask[:,:,0] == 1
+        mat[:,:,1] = mask[:,:,0] == 2
+        mask = mat
         #img_path = os.path.join(self.image_dir, self.images[index])
         #mask_path = os.path.join(self.mask_dir, self.images[index].replace(".jpg", "_mask.gif"))
         #image = np.array(Image.open(img_path).convert("RGB"))
@@ -97,11 +99,19 @@ class LiTS(Dataset):
           augmentations = self.transform(image=image, mask=mask)
           image = augmentations["image"]
           mask = augmentations["mask"]
-          mat = torch.zeros((2,mask.shape[0], mask.shape[1]))
-          mat[0,:,:] = mask[:,:,0]
-          mat[1,:,:] = mask[:,:,1]
-          mask = mat
+          
+          if self.class_dimention:
 
+            mat = torch.zeros((2,mask.shape[0], mask.shape[1]))
+            mat[0,:,:] = mask[:,:,0]
+            mat[1,:,:] = mask[:,:,1]
+
+          else:
+
+            mat = torch.zeros((1,mask.shape[0], mask.shape[1]))
+            mat[0,:,:] = mask[:,:,0]
+
+          mask = mat
       return image, mask
     def obtener_numero(self,nombre):
       a = nombre.find('-')
