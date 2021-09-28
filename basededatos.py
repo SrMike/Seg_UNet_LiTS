@@ -99,7 +99,7 @@ class LiTS(Dataset):
           augmentations = self.transform(image=image, mask=mask)
           image = augmentations["image"]
           mask = augmentations["mask"]
-          
+
           if self.class_dimention:
 
             mat = torch.zeros((2,mask.shape[0], mask.shape[1]))
@@ -108,8 +108,8 @@ class LiTS(Dataset):
 
           else:
 
-            mat = torch.zeros((1,mask.shape[0], mask.shape[1]))
-            mat[0,:,:] = mask[:,:,0]
+            mat = torch.zeros((mask.shape[0], mask.shape[1]))
+            mat[:,:] = mask[:,:,0]
 
           mask = mat
       return image, mask
