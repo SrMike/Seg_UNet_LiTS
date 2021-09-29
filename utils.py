@@ -77,6 +77,7 @@ def dice_score(tar, prediction):
   if len(prediction.shape) > len(tar.shape):
     clases = prediction.shape[1]
     target = gen_dim_clases(tar,clases)
+    
   else:
     target = tar
 
@@ -143,7 +144,8 @@ def jaccard_index(tar, prediction):
 def gen_dim_clases(target,clases):
   lote, filas, columnas = target.shape
   if type(target) == torch.Tensor:
-    tar = torch.zeros((lote, clases, filas, columnas), dtype = torch.long)
+    tar = torch.zeros((lote, clases, filas, columnas), dtype = torch.long, device = target.device.type)
+    
   else:
     tar = np.zeros((lote, clases, filas, columnas), dtype = np.int32)
     

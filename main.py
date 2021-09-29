@@ -31,7 +31,7 @@ from utils import (
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 16
-NUM_EPOCHS = 0
+NUM_EPOCHS = 10
 NUM_WORKERS = 2
 IMAGE_HEIGHT = 448  # 
 IMAGE_WIDTH =  448  # 
@@ -49,7 +49,7 @@ VAL_MASK_DIR = "/content/validacion/seg"
 
 #__________guardar información sobre el entrenamiento___________________________
 
-mode = 'UNET'
+mode = 'SEGNET'
 data = 'LiTS'
 shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
 batch = BATCH_SIZE
