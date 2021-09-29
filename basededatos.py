@@ -13,7 +13,7 @@ import nibabel as nib
 from tqdm import tqdm, notebook
 import torch
 class LiTS(Dataset):
-    def __init__(self, image_dir, mask_dir, transform=None, class_dimention = True):
+    def __init__(self, image_dir, mask_dir, transform=None, class_dimention = False):
       self.image_dir = image_dir # directorio de los volumenes en formato string
       self.mask_dir = mask_dir   # directorio de las mascaras en formato string
       self.transform = transform
@@ -117,7 +117,7 @@ class LiTS(Dataset):
 
             mat = torch.zeros((mask.shape[0], mask.shape[1]), dtype = torch.long)
             
-            mat[:,:] = mask[:,:]
+            mat[:,:] = mask[:,:].long()
 
           mask = mat
       return image, mask

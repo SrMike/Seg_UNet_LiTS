@@ -31,7 +31,7 @@ from utils import (
 LEARNING_RATE = 1e-4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 16
-NUM_EPOCHS = 10
+NUM_EPOCHS = 1
 NUM_WORKERS = 2
 IMAGE_HEIGHT = 448  # 
 IMAGE_WIDTH =  448  # 
@@ -55,7 +55,7 @@ shape = (IMAGE_HEIGHT, IMAGE_WIDTH)
 batch = BATCH_SIZE
 ad = 'AD' # data aumentation
 opti = 'ADAM'
-nclass = 2
+nclass = 3
 
 nombre = generador_nombre(mode, data, shape, batch, ad, opti, nclass)
 DIR = '/content/drive/MyDrive/SOFTWARE_TT/datos/LiTS/'
@@ -79,7 +79,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler,info):
             
             predictions = model(data)
 
-            loss = loss_fn(predictions.float(), targets.float())
+            loss = loss_fn(predictions.float(), targets)
             
             info.agrega(loss.detach().cpu().numpy(), (0,0), (0,0))
         # backward
@@ -117,13 +117,18 @@ def main():
             ToTensorV2(),
         ],
     )
+    if mode == "UNET":
+      model = UNET(in_channels=3, out_channels=3).to(DEVICE)
+    elif mode == "TC_UNET":
+      model = TC_UNET(in_channels=3, out_channels=3).to(DEVICE)
+    elif mode == "SEGNET":
+      model = SEGNET(in_channels=3, out_channels=3).to(DEVICE)
+
+    #loss_fn = nn.BCEWithLogitsLoss()
+    loss_fn = nn.CrossEntropyLoss()
     
-    model = TC_UNET(in_channels=3, out_channels=2).to(DEVICE)
-
-    loss_fn = nn.BCEWithLogitsLoss()
-
-    #optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    optimizer = optim.SDG(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    #optimizer = optim.SDG(model.parameters(), lr=LEARNING_RATE)
     train_loader, val_loader = get_loaders(
         TRAIN_IMG_DIR,
         TRAIN_MASK_DIR,
