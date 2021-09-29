@@ -73,7 +73,7 @@ def get_loaders(
     )
 
     return train_loader, val_loader
-def dice_score(target, prediction):
+def dice_score(tar, prediction):
   if len(prediction.shape) > len(tar.shape):
     clases = prediction.shape[1]
     target = gen_dim_clases(tar,clases)
