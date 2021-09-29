@@ -74,14 +74,21 @@ def get_loaders(
 
     return train_loader, val_loader
 def dice_score(target, prediction):
+  if len(prediction.shape) > len(tar.shape):
+    clases = prediction.shape[1]
+    target = gen_dim_clases(tar,clases)
+  else:
+    target = tar
+
   if len(target.shape) == 3:
     target.unsqueeze_(0)
     prediction.unsqueeze_(0)
-
+  
   if type(target) == torch.Tensor:
     target = target.long()
   else:
     target = np.int32(target)
+
   if type(prediction) == torch.Tensor:
     prediction = prediction.long()
   else:
@@ -97,17 +104,25 @@ def dice_score(target, prediction):
     dice.append((2 * (preds * y).sum()) / ((preds + y).sum() + 1e-8))
   return dice
 
-def jaccard_index(target, prediction):
-  if len(target.shape) == 3:
-    target.unsqueeze_(0)
+def jaccard_index(tar, prediction):
+  if len(prediction.shape) > len(tar.shape):
+    clases = prediction.shape[1]
+    target = gen_dim_clases(tar,clases)
+  else:
+    target = tar
+
+  if len(prediction.shape) == 3:
     prediction.unsqueeze_(0)
 
+  if len(target.shape) == 3:
+    target.unsqueeze_(0)
   
 
   if type(target) == torch.Tensor:
     target = target.long()
   else:
     target = np.int32(target)
+
   if type(prediction) == torch.Tensor:
     prediction = prediction.long()
   else:
@@ -125,7 +140,16 @@ def jaccard_index(target, prediction):
     union = t.sum()+p.sum()-inter + 1e-8
     ji.append(inter/union)
   return ji
-
+def gen_dim_clases(target,clases):
+  lote, filas, columnas = target.shape
+  if type(target) == torch.Tensor:
+    tar = torch.zeros((lote, clases, filas, columnas), dtype = torch.long)
+  else:
+    tar = np.zeros((lote, clases, filas, columnas), dtype = np.int32)
+    
+  for i in range(clases):
+    tar[:,i,:,:] = target == i
+  return tar
 #def accurrancy(target, prediction):
 #  if type(target) == torch.Tensor:
 #    target = target.long()

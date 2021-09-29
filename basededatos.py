@@ -109,14 +109,15 @@ class LiTS(Dataset):
 
           if self.class_dimention:
 
-            mat = torch.zeros((2,mask.shape[0], mask.shape[1]))
+            mat = torch.zeros((2,mask.shape[0], mask.shape[1]), dtype = torch.long)
             mat[0,:,:] = mask[:,:,0]
             mat[1,:,:] = mask[:,:,1]
 
           else:
 
-            mat = torch.zeros((mask.shape[0], mask.shape[1]))
-            mat[:,:] = mask[:,:,0]
+            mat = torch.zeros((mask.shape[0], mask.shape[1]), dtype = torch.long)
+            
+            mat[:,:] = mask[:,:]
 
           mask = mat
       return image, mask
